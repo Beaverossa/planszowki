@@ -2,33 +2,37 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Lista gier planszowych</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranking Gier Planszowych</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>Lista gier planszowych</h1>
-    <nav>
-      <a href="index.html">Strona główna</a>
-    </nav>
+    <h1>Ranking Gier Planszowych</h1>
   </header>
 
   <main>
-    <!-- Lista gier wczytywana z Firestore -->
-    <section id="game-list"></section>
-
-    <!-- Formularz dodawania nowej gry -->
+    <!-- Formularz dodawania gry -->
     <section>
       <h2>Dodaj nową grę</h2>
       <form id="add-game-form">
         <input type="text" id="game-name" placeholder="Nazwa gry" required>
-        <input type="url" id="game-icon" placeholder="URL ikony (opcjonalnie)">
+        <input type="url" id="game-icon" placeholder="Link do ikony (opcjonalnie)">
         <button type="submit">Dodaj grę</button>
       </form>
     </section>
+
+    <!-- Lista gier -->
+    <section>
+      <h2>Lista gier</h2>
+      <div id="game-list" class="game-list"></div>
+    </section>
   </main>
 
-  <script type="module" src="firebase-config.js"></script>
+  <footer>
+    <p>© 2025 Twoja Strona Gier Planszowych</p>
+  </footer>
+
   <script type="module" src="index.js"></script>
 </body>
 </html>
