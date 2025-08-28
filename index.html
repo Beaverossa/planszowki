@@ -3,30 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rankingi Gier Planszowych</title>
+  <title>Ranking Gier Planszowych</title>
   <link rel="stylesheet" href="style.css">
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="index.js"></script>
 </head>
 <body>
   <header>
     <nav>
-      <h1>Rankingi Gier Planszowych</h1>
-      <ul>
-        <li><a href="index.html">Strona główna</a></li>
-        <li><a href="hall.html">Hall of Fame</a></li>
-        <li><button id="theme-toggle">🌙/☀️</button></li>
-      </ul>
+      <h1>Ranking Gier Planszowych</h1>
     </nav>
   </header>
 
   <main>
-    <section id="game-list">
-      <!-- Karty gier ładowane dynamicznie z Firebase -->
+    <section>
+      <h2>Lista gier</h2>
+      <div id="game-list" class="games-grid">
+        <p>Ładowanie gier...</p>
+      </div>
     </section>
   </main>
 
   <footer>
-    <p>Projekt hostowany na GitHub Pages</p>
-    <a href="https://github.com/Beaverossa" target="_blank">Repozytorium</a>
+    <p>&copy; 2025 Twoja Strona Gier Planszowych</p>
   </footer>
 </body>
 </html>
