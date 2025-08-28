@@ -1,59 +1,43 @@
 import { db } from './firebase-config.js';
-import { collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { collection, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const gameList = document.getElementById('game-list');
+const addGameForm = document.getElementById('add-game-form');
 
 async function loadGames() {
-  const gameList = document.getElementById('game-list');
-  gameList.innerHTML = '<p>Ładowanie gier...</p>';
+  gameList.innerHTML = '';
+  const querySnapshot = await getDocs(collection(db, "games"));
+  
+  querySnapshot.forEach((docSnap) => {
+    const game = docSnap.data();
+    const name = game.name || docSnap.id;
+    const icon = game.icon || 'assets/default.png';
 
-  try {
-    const querySnapshot = await getDocs(collection(db, "games"));
-    gameList.innerHTML = '';
-
-    if (querySnapshot.empty) {
-      gameList.innerHTML = '<p>Brak gier w bazie danych.</p>';
-      return;
-    }
-
-    querySnapshot.forEach((doc) => {
-      const game = doc.data();
-      const card = document.createElement('div');
-      card.classList.add('game-card');
-      card.innerHTML = `
-        <img src="${game.icon || 'assets/default.png'}" alt="${game.name}" width="100">
-        <h3>${game.name}</h3>
-        <a href="game.html?gameId=${doc.id}">Zobacz ranking</a>
-      `;
-      gameList.appendChild(card);
-    });
-  } catch (error) {
-    console.error("Błąd ładowania gier:", error);
-    gameList.innerHTML = '<p>Błąd połączenia z bazą danych.</p>';
-  }
+    const card = document.createElement('div');
+    card.classList.add('game-card');
+    card.innerHTML = `
+      <img src="${icon}" alt="${name}" width="100">
+      <h3>${name}</h3>
+      <a href="game.html?gameId=${docSnap.id}">Zobacz ranking</a>
+    `;
+    gameList.appendChild(card);
+  });
 }
 
-async function addGame(event) {
-  event.preventDefault();
-  const nameInput = document.getElementById('game-name');
-  const iconInput = document.getElementById('game-icon');
+addGameForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('game-name').value.trim();
+  const icon = document.getElementById('game-icon').value.trim();
 
-  const newGame = {
-    name: nameInput.value.trim(),
-    icon: iconInput.value.trim() || null
-  };
+  if (!name) return;
 
-  try {
-    await addDoc(collection(db, "games"), newGame);
-    alert('Gra została dodana!');
-    nameInput.value = '';
-    iconInput.value = '';
-    loadGames(); // odświeżenie listy
-  } catch (error) {
-    console.error("Błąd dodawania gry:", error);
-    alert('Nie udało się dodać gry.');
-  }
-}
+  await setDoc(doc(db, "games", name), {
+    name: name,
+    icon: icon || ''
+  });
 
-document.addEventListener('DOMContentLoaded', () => {
-  loadGames();
-  document.getElementById('add-game-form').addEventListener('submit', addGame);
+  addGameForm.reset();
+  loadGames(); // odśwież listę po dodaniu
 });
+
+loadGames();
