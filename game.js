@@ -1,89 +1,42 @@
 import { db } from './firebase-config.js';
-import { doc, getDoc, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-async function loadGame() {
-  const params = new URLSearchParams(window.location.search);
-  const gameId = params.get('gameId');
-  if (!gameId) return;
+const urlParams = new URLSearchParams(window.location.search);
+const gameId = urlParams.get('gameId');
+document.getElementById('game-title').textContent = `Gra: ${gameId}`;
 
-  const gameRef = doc(db, "games", gameId);
-  const gameSnap = await getDoc(gameRef);
-  if (!gameSnap.exists()) {
-    document.getElementById('game-title').innerText = "Nie znaleziono gry";
-    return;
-  }
+const scoreForm = document.getElementById('add-score-form');
+const scoreTable = document.querySelector('#score-table tbody');
 
-  const gameData = gameSnap.data();
-  document.getElementById('game-title').innerText = gameData.name;
+async function loadScores() {
+  scoreTable.innerHTML = '';
+  const scoresRef = collection(db, `games/${gameId}/scores`);
+  const q = query(scoresRef, orderBy("score", "desc"));
+  const querySnapshot = await getDocs(q);
 
-  await loadRanking(gameId);
-  await loadMatches(gameId);
-
-  // obsługa formularza
-  const form = document.getElementById('add-match-form');
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    await addMatch(gameId);
+  querySnapshot.forEach(docSnap => {
+    const data = docSnap.data();
+    const row = document.createElement('tr');
+    row.innerHTML = `<td>${data.player}</td><td>${data.score}</td>`;
+    scoreTable.appendChild(row);
   });
 }
 
-async function loadRanking(gameId) {
-  const rankingBody = document.querySelector('#ranking tbody');
-  rankingBody.innerHTML = '';
-  const playersCol = collection(db, `games/${gameId}/players`);
-  const playersSnap = await getDocs(playersCol);
+scoreForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const player = document.getElementById('player-name').value.trim();
+  const score = parseInt(document.getElementById('player-score').value);
 
-  playersSnap.forEach(doc => {
-    const p = doc.data();
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><a href="player.html?playerId=${doc.id}">${p.name}</a></td>
-      <td>${p.wins || 0}</td>
-      <td>${p.points || 0}</td>
-      <td>${p.streak || 0}</td>
-    `;
-    rankingBody.appendChild(tr);
-  });
-}
+  if (!player || isNaN(score)) return;
 
-async function loadMatches(gameId) {
-  const matchesBody = document.querySelector('#matches tbody');
-  matchesBody.innerHTML = '';
-  const matchesCol = collection(db, `games/${gameId}/matches`);
-  const matchesSnap = await getDocs(matchesCol);
-
-  matchesSnap.forEach(doc => {
-    const m = doc.data();
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${m.date || '-'}</td>
-      <td>${(m.results || []).map(r => `${r.name}: ${r.score}`).join(', ')}</td>
-      <td>${m.notes || ''}</td>
-    `;
-    matchesBody.appendChild(tr);
-  });
-}
-
-async function addMatch(gameId) {
-  const dateInput = document.getElementById('match-date').value;
-  const resultsInput = document.getElementById('match-results').value;
-  const notesInput = document.getElementById('match-notes').value;
-
-  // Parsowanie wpisanych graczy
-  const results = resultsInput.split(',').map(pair => {
-    const [name, score] = pair.split('=').map(s => s.trim());
-    return { name, score: parseInt(score, 10) };
+  const scoresRef = collection(db, `games/${gameId}/scores`);
+  await addDoc(scoresRef, {
+    player: player,
+    score: score
   });
 
-  // Zapis w bazie
-  await addDoc(collection(db, `games/${gameId}/matches`), {
-    date: dateInput,
-    results: results,
-    notes: notesInput || ''
-  });
+  scoreForm.reset();
+  loadScores();
+});
 
-  alert('Wynik został zapisany!');
-  await loadMatches(gameId); // odśwież tabelę
-}
-
-document.addEventListener('DOMContentLoaded', loadGame);
+loadScores();
