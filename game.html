@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Szczegóły gry</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="index.html">← Powrót</a>
+      <h1 id="game-title">Nazwa Gry</h1>
+      <button id="add-result-btn">Dodaj wynik</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Ranking graczy -->
+    <section id="ranking">
+      <h2>Ranking graczy</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nick</th>
+            <th>Zwycięstwa</th>
+            <th>Punkty</th>
+            <th>Streak</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Wiersze wypełniane dynamicznie -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Historia rozgrywek -->
+    <section id="matches">
+      <h2>Historia rozgrywek</h2>
+      <input type="text" placeholder="Szukaj gracza">
+      <input type="date" id="filter-date">
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Gracze i wyniki</th>
+            <th>Uwagi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dane ładowane dynamicznie -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Wykres wyników -->
+    <section id="chart">
+      <h2>Postępy graczy</h2>
+      <div id="chart-container">
+        <!-- Wykres renderowany w JS -->
+      </div>
+    </section>
+
+    <!-- Formularz dodawania wyniku (może być modalem) -->
+    <section id="add-result-form" style="display:none;">
+      <h2>Dodaj nowy wynik</h2>
+      <form>
+        <label>Data: <input type="date" id="match-date"></label>
+        <div id="players-inputs">
+          <!-- Pola dla graczy i punktów -->
+        </div>
+        <label>Uwagi: <textarea id="match-notes"></textarea></label>
+        <button type="submit">Zapisz</button>
+        <button type="button" id="cancel-form">Anuluj</button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p><a href="#top">Do góry</a></p>
+  </footer>
+</body>
+</html>
