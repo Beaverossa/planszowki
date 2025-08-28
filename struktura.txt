@@ -1,0 +1,14 @@
+/ (root)
+│── index.html          # Strona główna – lista gier
+│── game.html           # Strona pojedynczej gry (ranking, wyniki)
+│── player.html         # Profil gracza (opcjonalnie)
+│── hall.html           # Hall of Fame (opcjonalnie)
+│── style.css           # Główny plik stylów
+│── main.js             # Skrypt główny dla index.html
+│── game.js             # Skrypt dla strony gry
+│── player.js           # Skrypt dla profilu gracza
+│── hall.js             # Skrypt dla Hall of Fame
+│── firebase-config.js  # Konfiguracja Firebase
+└── /assets
+     ├── /images        # Ikony gier, avatary
+     └── /icons         # Ikony nawigacji / UI
