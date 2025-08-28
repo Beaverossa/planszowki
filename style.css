@@ -85,3 +85,48 @@ form button:hover {
   background: #0056b3;
 }
 
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+}
+
+.game-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  text-align: center;
+  padding: 15px;
+  transition: transform 0.2s;
+}
+
+.game-card img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.game-card h3 {
+  margin: 5px 0;
+  font-size: 1.1em;
+}
+
+.game-card a {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: #007bff;
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.game-card a:hover {
+  background: #0056b3;
+}
+
+.game-card:hover {
+  transform: translateY(-5px);
+}
