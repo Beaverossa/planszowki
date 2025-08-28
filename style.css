@@ -1,0 +1,60 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f4f4f4;
+  color: #333;
+}
+
+header nav {
+  background: #222;
+  color: white;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header nav a, header nav button {
+  color: white;
+  margin-left: 15px;
+  text-decoration: none;
+}
+
+main {
+  padding: 20px;
+}
+
+.game-card {
+  display: inline-block;
+  width: 180px;
+  margin: 10px;
+  padding: 10px;
+  background: white;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+table th, table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+table th {
+  background: #444;
+  color: white;
+}
+
+footer {
+  background: #222;
+  color: white;
+  padding: 10px;
+  text-align: center;
+}
