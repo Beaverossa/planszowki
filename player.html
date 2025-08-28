@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil gracza</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="index.html">← Powrót</a>
+      <h1 id="player-name">Nick Gracza</h1>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Statystyki ogólne -->
+    <section id="player-stats">
+      <h2>Statystyki</h2>
+      <ul>
+        <li>Łączne zwycięstwa: <span id="total-wins">0</span></li>
+        <li>Najwyższy wynik: <span id="best-score">0</span></li>
+        <li>Streak: <span id="streak">0</span></li>
+      </ul>
+    </section>
+
+    <!-- Gry, w których gracz brał udział -->
+    <section id="player-games">
+      <h2>Gry gracza</h2>
+      <div id="games-list">
+        <!-- Lista gier z mini rankingami -->
+      </div>
+    </section>
+
+    <!-- Historia rozgrywek -->
+    <section id="player-history">
+      <h2>Historia rozgrywek</h2>
+      <ul>
+        <!-- Lista wyników w formie osi czasu -->
+      </ul>
+    </section>
+
+    <!-- Wykres wyników gracza -->
+    <section id="player-chart">
+      <h2>Postępy gracza</h2>
+      <div id="chart-container">
+        <!-- Wykres renderowany w JS -->
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p><a href="#top">Do góry</a></p>
+  </footer>
+</body>
+</html>
