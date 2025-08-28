@@ -8,76 +8,35 @@
 </head>
 <body>
   <header>
-    <nav>
-      <a href="index.html">← Powrót</a>
-      <h1 id="game-title">Nazwa Gry</h1>
-      <button id="add-result-btn">Dodaj wynik</button>
-    </nav>
+    <h1 id="game-title">Szczegóły gry</h1>
+    <a href="index.html">← Powrót</a>
   </header>
 
   <main>
-    <!-- Ranking graczy -->
-    <section id="ranking">
-      <h2>Ranking graczy</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Nick</th>
-            <th>Zwycięstwa</th>
-            <th>Punkty</th>
-            <th>Streak</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Wiersze wypełniane dynamicznie -->
-        </tbody>
-      </table>
-    </section>
-
-    <!-- Historia rozgrywek -->
-    <section id="matches">
-      <h2>Historia rozgrywek</h2>
-      <input type="text" placeholder="Szukaj gracza">
-      <input type="date" id="filter-date">
-      <table>
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Gracze i wyniki</th>
-            <th>Uwagi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Dane ładowane dynamicznie -->
-        </tbody>
-      </table>
-    </section>
-
-    <!-- Wykres wyników -->
-    <section id="chart">
-      <h2>Postępy graczy</h2>
-      <div id="chart-container">
-        <!-- Wykres renderowany w JS -->
-      </div>
-    </section>
-
-    <!-- Formularz dodawania wyniku (może być modalem) -->
-    <section id="add-result-form" style="display:none;">
-      <h2>Dodaj nowy wynik</h2>
-      <form>
-        <label>Data: <input type="date" id="match-date"></label>
-        <div id="players-inputs">
-          <!-- Pola dla graczy i punktów -->
-        </div>
-        <label>Uwagi: <textarea id="match-notes"></textarea></label>
-        <button type="submit">Zapisz</button>
-        <button type="button" id="cancel-form">Anuluj</button>
+    <section>
+      <h2>Dodaj wynik</h2>
+      <form id="add-score-form">
+        <input type="text" id="player-name" placeholder="Imię gracza" required>
+        <input type="number" id="player-score" placeholder="Wynik" required>
+        <button type="submit">Dodaj wynik</button>
       </form>
+    </section>
+
+    <section>
+      <h2>Ranking</h2>
+      <table id="score-table">
+        <thead>
+          <tr><th>Gracz</th><th>Wynik</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </section>
   </main>
 
   <footer>
-    <p><a href="#top">Do góry</a></p>
+    <p>© 2025 Twoja Strona Gier Planszowych</p>
   </footer>
+
+  <script type="module" src="game.js"></script>
 </body>
 </html>
