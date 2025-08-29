@@ -5,6 +5,8 @@
   --primary: #007bff;
   --primary-hover: #339dff;
   --accent: #ffb300;
+  --danger: #dc3545;
+  --danger-hover: #fa5b6a;
   --text: #e4e6eb;
   --text-muted: #b0b3b8;
   --border-radius: 16px;
@@ -62,6 +64,7 @@ footer {
   min-height: 220px;
   max-height: 320px;
   min-width: 0;
+  position: relative;
 }
 
 .game-card:hover {
@@ -91,8 +94,7 @@ footer {
   box-shadow: 0 2px 10px rgba(0,0,0,.18);
 }
 
-.game-card .game-link:hover,
-button:hover {
+.game-card .game-link:hover {
   background: var(--primary-hover);
 }
 
@@ -104,13 +106,31 @@ button:hover {
   box-shadow: 0 2px 10px rgba(0,0,0,.18);
 }
 
+.delete-btn {
+  margin-top: 14px;
+  padding: 8px 18px;
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 0.95em;
+  cursor: pointer;
+  transition: background .2s;
+  box-shadow: 0 2px 10px rgba(0,0,0,.12);
+}
+
+.delete-btn:hover {
+  background: var(--danger-hover);
+}
+
 form {
   display: flex;
   gap: 12px;
   margin-bottom: 18px;
+  flex-wrap: wrap;
 }
 
-input[type="text"], input[type="number"] {
+input[type="text"], input[type="url"], input[type="number"] {
   background: var(--bg-card);
   color: var(--text);
   border: none;
@@ -121,7 +141,7 @@ input[type="text"], input[type="number"] {
   transition: box-shadow .17s;
 }
 
-input[type="text"]:focus, input[type="number"]:focus {
+input[type="text"]:focus, input[type="url"]:focus, input[type="number"]:focus {
   box-shadow: 0 0 0 2px var(--primary);
 }
 
@@ -155,5 +175,9 @@ section {
   }
   h1, h2 {
     font-size: 1.1em;
+  }
+  form {
+    flex-direction: column;
+    gap: 8px;
   }
 }
