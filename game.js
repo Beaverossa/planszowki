@@ -1,180 +1,119 @@
 import { db } from './firebase-config.js';
-import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const urlParams = new URLSearchParams(window.location.search);
-const gameId = urlParams.get('gameId');
-const gameRef = doc(db, "games", gameId);
-
-const gameTitle = document.getElementById("game-title");
-const addSessionBtn = document.getElementById("add-session-btn");
-const addSessionForm = document.getElementById("add-session-form");
-const playersCountInput = document.getElementById("players-count");
-const playersFieldsDiv = document.getElementById("players-fields");
-const cancelSessionBtn = document.getElementById("cancel-session");
-const rankingTable = document.querySelector("#ranking-table tbody");
-const historyList = document.getElementById("history-list");
-const scoreChartCanvas = document.getElementById("score-chart");
-
-let currentGameData = null;
-let playerColors = {};
-
-const getRandomColor = () => {
-  // Przyjemne, dobrze widoczne kolory
-  const palette = [
-    "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231",
-    "#911eb4", "#46f0f0", "#f032e6", "#bcf60c", "#fabebe",
-    "#008080", "#e6beff", "#9a6324", "#fffac8", "#800000",
-    "#aaffc3", "#808000", "#ffd8b1", "#000075", "#808080"
-  ];
-  return palette[Math.floor(Math.random() * palette.length)];
-};
-
-// Pobierz dane gry i renderuj
-async function loadGame() {
-  const snap = await getDoc(gameRef);
-  if (!snap.exists()) {
-    gameTitle.textContent = "Gra nie znaleziona";
-    return;
-  }
-  currentGameData = snap.data();
-  playerColors = currentGameData.playerColors || {};
-  gameTitle.textContent = `Gra: ${currentGameData.name}`;
-  renderRankingAndHistory();
+// Pobierz gameId z URL
+function getGameId() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('gameId');
 }
 
-async function renderRankingAndHistory() {
+const gameId = getGameId();
+if (!gameId) {
+  document.body.innerHTML = '<main><h2>Błąd: Nie podano ID gry!</h2></main>';
+  throw new Error('Brak gameId w URL!');
+}
+
+const gameRef = doc(db, "games", gameId);
+
+async function renderGame() {
+  const snap = await getDoc(gameRef);
+  if (!snap.exists()) {
+    document.body.innerHTML = '<main><h2>Brak danych o tej grze!</h2></main>';
+    return;
+  }
+  const data = snap.data();
+  document.getElementById('game-title').textContent = data.name || "Szczegóły gry";
+
+  // 1. Ranking graczy
+  const sessions = data.sessions || {};
+  const totals = {};
+  const notesList = [];
+  Object.values(sessions).forEach(s => {
+    Object.entries(s.scores || {}).forEach(([player, score]) => {
+      totals[player] = (totals[player] || 0) + score;
+    });
+    if (s.notes) notesList.push({date: s.date, note: s.notes});
+  });
+
+  const ranking = Object.entries(totals)
+    .sort(([,a],[,b]) => b-a)
+    .map(([player, score]) => ({player, score}));
+  const rankingDiv = document.getElementById('game-ranking');
+  rankingDiv.innerHTML = '';
+  ranking.forEach(r =>
+    rankingDiv.innerHTML += `<div class="result-card"><h3>${r.player}</h3><p>Punkty: <span class="score">${r.score}</span></p></div>`
+  );
+
+  // 2. Wykres wyników
+  const chartCanvas = document.getElementById('score-chart');
+  const sessionDates = [];
+  const players = Object.keys(data.playerColors || totals);
+  const scoresByPlayer = {};
+  players.forEach(p => scoresByPlayer[p] = []);
+  Object.values(sessions).forEach(s => {
+    sessionDates.push(s.date || '');
+    players.forEach(p => {
+      scoresByPlayer[p].push(s.scores?.[p] || 0);
+    });
+  });
+  // Chart.js
+  if (chartCanvas) {
+    chartCanvas.height = 320;
+    new window.Chart(chartCanvas, {
+      type: 'line',
+      data: {
+        labels: sessionDates,
+        datasets: players.map(p => ({
+          label: p,
+          data: scoresByPlayer[p],
+          backgroundColor: data.playerColors?.[p] || "#339dff",
+          borderColor: data.playerColors?.[p] || "#339dff",
+          fill: false,
+          tension: 0.25
+        }))
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: "#e4e6eb" } } },
+        scales: {
+          x: { ticks: { color: "#b0b3b8" } },
+          y: { ticks: { color: "#b0b3b8" }, beginAtZero: true }
+        }
+      }
+    });
+  }
+
+  // 3. Uwagi do rozgrywek
+  const notesDiv = document.getElementById('game-notes');
+  notesDiv.innerHTML = notesList.length ? notesList.map(n =>
+    `<div class="notes-box"><b>${n.date || ''}</b>: ${n.note}</div>`
+  ).join('') : '<p>Brak uwag.</p>';
+
+  // 4. Formularz dodawania sesji
+  const playersListDiv = document.getElementById('players-list');
+  const playersForm = Object.keys(data.playerColors || totals);
+  playersListDiv.innerHTML = playersForm.map(p =>
+    `<label>${p}: <input type="number" name="score-${p}" min="0" value="0"></label>`
+  ).join(" ");
+}
+renderGame();
+
+document.getElementById('add-session-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
   const snap = await getDoc(gameRef);
   if (!snap.exists()) return;
   const data = snap.data();
   const sessions = data.sessions || {};
-  playerColors = data.playerColors || {};
-
-  // Ranking: suma punktów gracza po imieniu
-  const scoresSum = {};
-  const history = [];
-  Object.entries(sessions).forEach(([sessionId, session]) => {
-    history.push({ date: session.date, scores: session.scores });
-    Object.entries(session.scores).forEach(([player, points]) => {
-      scoresSum[player] = (scoresSum[player] || 0) + points;
-    });
+  const newId = Date.now().toString();
+  const scores = {};
+  Object.keys(data.playerColors || {}).forEach(p => {
+    const val = parseInt(document.querySelector(`[name="score-${p}"]`)?.value || "0", 10);
+    scores[p] = isNaN(val) ? 0 : val;
   });
-
-  // Render ranking
-  rankingTable.innerHTML = '';
-  Object.entries(scoresSum)
-    .sort(([,a],[,b])=>b-a)
-    .forEach(([player, sum]) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${player}</td><td>${sum}</td>`;
-      rankingTable.appendChild(tr);
-    });
-
-  // Render historia
-  historyList.innerHTML = '';
-  history.forEach((entry, idx) => {
-    const div = document.createElement('div');
-    div.className = 'history-card';
-    div.innerHTML = `<strong>Rozgrywka ${idx+1} (${entry.date}):</strong><ul>`
-      + Object.entries(entry.scores).map(([p, pts]) => `<li>${p}: ${pts} pkt</li>`).join('')
-      + `</ul>`;
-    historyList.appendChild(div);
-  });
-
-  // Render wykres
-  renderChart(history);
-}
-
-// Dodawanie rozgrywki
-addSessionBtn.addEventListener('click', () => {
-  addSessionForm.style.display = 'flex';
-  addSessionBtn.style.display = 'none';
-  playersFieldsDiv.innerHTML = '';
-  playersCountInput.value = '';
+  const date = document.getElementById('session-date').value || new Date().toISOString().split('T')[0];
+  const notes = document.getElementById('session-notes').value || '';
+  sessions[newId] = {date, notes, scores};
+  await updateDoc(gameRef, {sessions});
+  renderGame();
+  this.reset();
 });
-
-playersCountInput.addEventListener('input', () => {
-  const n = parseInt(playersCountInput.value) || 0;
-  playersFieldsDiv.innerHTML = '';
-  for(let i=0;i<n;i++) {
-    playersFieldsDiv.innerHTML += `
-      <label>Gracz ${i+1} <input type="text" class="player-name" placeholder="Imię gracza" required></label>
-      <label>Punkty <input type="number" class="player-score" min="0" required></label>
-    `;
-  }
-});
-
-cancelSessionBtn.addEventListener('click', () => {
-  addSessionForm.style.display = 'none';
-  addSessionBtn.style.display = '';
-  playersFieldsDiv.innerHTML = '';
-  playersCountInput.value = '';
-});
-
-addSessionForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const names = Array.from(addSessionForm.querySelectorAll('.player-name')).map(i=>i.value.trim()).filter(Boolean);
-  const scores = Array.from(addSessionForm.querySelectorAll('.player-score')).map(i=>parseInt(i.value));
-  if (names.length !== scores.length || names.length<2) return;
-  const sessionId = `${Date.now()}`;
-  const date = new Date().toISOString().slice(0,10);
-  const sessionData = { date, scores: {} };
-  names.forEach((name, idx) => {
-    sessionData.scores[name]=scores[idx];
-    // Tylko jeśli gracz nie ma przypisanego koloru, losuj i zapisz
-    if (!playerColors[name]) {
-      playerColors[name] = getRandomColor();
-    }
-  });
-
-  // Zapisz do Firebase, łącznie z playerColors
-  const gameSnap = await getDoc(gameRef);
-  let gameData = gameSnap.data();
-  if(!gameData.sessions) gameData.sessions = {};
-  if(!gameData.playerColors) gameData.playerColors = {};
-  Object.assign(gameData.playerColors, playerColors);
-  gameData.sessions[sessionId] = sessionData;
-  await updateDoc(gameRef, { sessions: gameData.sessions, playerColors: gameData.playerColors });
-
-  addSessionForm.style.display = 'none';
-  addSessionBtn.style.display = '';
-  playersFieldsDiv.innerHTML = '';
-  playersCountInput.value = '';
-  renderRankingAndHistory();
-});
-
-// Wykres punktowy (Chart.js)
-function renderChart(history) {
-  // Zbierz sumy punktów dla każdego gracza w kolejnych rozgrywkach
-  const labels = history.map((_,i)=>`#${i+1}`);
-  const players = Array.from(new Set(history.flatMap(h=>Object.keys(h.scores))));
-  const datasets = players.map(player=>{
-    let sum = 0;
-    return {
-      label: player,
-      borderColor: playerColors[player] || "#888",
-      backgroundColor: "transparent",
-      data: history.map(h=>{
-        sum += h.scores[player]||0;
-        return sum;
-      }),
-      tension: 0.2,
-    }
-  });
-  scoreChartCanvas.height = Math.max(220, history.length*30);
-
-  if(window.scoreChart) window.scoreChart.destroy();
-  window.scoreChart = new Chart(scoreChartCanvas, {
-    type:'line',
-    data:{labels, datasets},
-    options:{
-      responsive:true,
-      plugins:{legend:{labels:{color:'#e4e6eb'}}},
-      scales:{
-        x:{ ticks:{color:'#e4e6eb'}, grid:{color:'#333'} },
-        y:{ ticks:{color:'#e4e6eb'}, grid:{color:'#333'} }
-      }
-    }
-  });
-}
-
-loadGame();
