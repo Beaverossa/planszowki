@@ -12,27 +12,21 @@
   </header>
 
   <main>
-    <!-- Formularz dodawania gry -->
     <section>
       <h2>Dodaj nową grę</h2>
-      <form id="add-game-form">
+      <form id="add-game-form" autocomplete="off">
         <input type="text" id="game-name" placeholder="Nazwa gry" required>
-        <input type="url" id="game-icon" placeholder="Link do ikony (opcjonalnie)">
         <button type="submit">Dodaj grę</button>
       </form>
     </section>
-
-    <!-- Lista gier -->
     <section>
       <h2>Lista gier</h2>
       <div id="game-list" class="game-list"></div>
     </section>
   </main>
-
   <footer>
     <p>© 2025 Twoja Strona Gier Planszowych</p>
   </footer>
-
   <script type="module" src="index.js"></script>
 </body>
 </html>
