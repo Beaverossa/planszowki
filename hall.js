@@ -1,57 +1,72 @@
 import { db } from './firebase-config.js';
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Helper: Fade in animation
-function fadeIn(element) {
-  element.classList.remove('fade-out');
-  element.classList.add('fade-in');
-  setTimeout(() => element.classList.remove('fade-in'), 400);
-}
-function fadeOut(element) {
-  element.classList.add('fade-out');
-  setTimeout(() => element.classList.remove('fade-out'), 400);
+// Helper: czy dany gracz wygrał rozgrywkę (najwięcej punktów, bez remisu)
+function getWinners(scoresObj) {
+  const entries = Object.entries(scoresObj);
+  if (entries.length === 0) return [];
+  const maxScore = Math.max(...entries.map(([_, v]) => v));
+  return entries.filter(([_, v]) => v === maxScore).map(([name]) => name);
 }
 
-// Zakładki
-const tabBtns = Array.from(document.querySelectorAll('.tab-btn'));
-const tabSections = Array.from(document.querySelectorAll('.tab-section'));
-function showTab(tab) {
-  tabSections.forEach(section => {
-    if (section.id === `tab-${tab}`) {
-      section.classList.add('visible');
-      fadeIn(section);
-    } else {
-      section.classList.remove('visible');
-      fadeOut(section);
-    }
+async function generateStatsAndRender() {
+  const gamesSnap = await getDocs(collection(db, "games"));
+  const gamesStats = {};
+  const playerStats = {};
+
+  gamesSnap.forEach(gameDoc => {
+    const gameId = gameDoc.id;
+    const gameData = gameDoc.data();
+    const sessions = gameData.sessions || {};
+    const playerTotals = {}; // suma punktów w tej grze
+    const playerWins = {};
+
+    Object.values(sessions).forEach(session => {
+      const scores = session.scores || {};
+      Object.entries(scores).forEach(([player, pts]) => {
+        playerTotals[player] = (playerTotals[player] || 0) + pts;
+        playerStats[player] = playerStats[player] || { totalPoints: 0, gamesPlayed: 0, gamesWon: 0 };
+        playerStats[player].totalPoints += pts;
+        playerStats[player].gamesPlayed += 1;
+      });
+      const winners = getWinners(scores);
+      if (winners.length === 1) {
+        const winner = winners[0];
+        playerWins[winner] = (playerWins[winner] || 0) + 1;
+        playerStats[winner].gamesWon += 1;
+      }
+    });
+
+    // Top 3 sum punktów w grze
+    const topScores = Object.entries(playerTotals)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 3)
+      .map(([player, score]) => ({ player, score }));
+
+    gamesStats[gameId] = {
+      name: gameData.name || 'Brak nazwy',
+      topScores
+    };
   });
-  tabBtns.forEach(btn => {
-    if (btn.dataset.tab === tab) btn.classList.add('active');
-    else btn.classList.remove('active');
+
+  Object.entries(playerStats).forEach(([player, stats]) => {
+    stats.winRate = stats.gamesPlayed > 0 ? stats.gamesWon / stats.gamesPlayed : 0;
   });
-  // Ukryj/przywróć przycisk Szczegóły gry
-  tabBtns[2].style.display = tab === 'game-details' ? 'inline-block' : 'none';
+
+  renderBestScores(gamesStats);
+  renderTopPlayers(playerStats);
 }
-tabBtns.forEach(btn => btn.addEventListener('click', () => showTab(btn.dataset.tab)));
-document.getElementById('back-to-games').addEventListener('click', () => showTab('games'));
 
-// Dynamiczne pobieranie z Firebase
-const hallRef = doc(db, "hallOfFame", "main");
-
-async function renderBestScores() {
-  const snap = await getDoc(hallRef);
-  if (!snap.exists()) return;
-  const data = snap.data();
-  const games = data.games || {};
+function renderBestScores(gamesStats) {
   const list = document.getElementById('best-scores-list');
   list.innerHTML = '';
-  Object.entries(games).forEach(([gameId, game]) => {
+  Object.entries(gamesStats).forEach(([gameId, game]) => {
     const card = document.createElement('div');
     card.className = 'result-card fade-in';
     card.innerHTML = `
       <h3><a class="game-link" data-game-id="${gameId}" href="#">${game.name}</a></h3>
       <ul>
-        ${game.topScores.map((score, idx) => 
+        ${game.topScores.map(score =>
           `<li><span class="player">${score.player}</span>: <span class="score">${score.score}</span> pkt</li>`
         ).join('')}
       </ul>
@@ -65,21 +80,14 @@ async function renderBestScores() {
   });
 }
 
-async function renderTopPlayers() {
-  const snap = await getDoc(hallRef);
-  if (!snap.exists()) return;
-  const data = snap.data();
-  const players = data.players || {};
-  // Sort by totalPoints desc, then winRate desc
-  const sorted = Object.entries(players)
-    .sort(([, a], [, b]) => {
-      if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
-      return (b.winRate || 0) - (a.winRate || 0);
-    })
+function renderTopPlayers(playerStats) {
+  // Sort by totalPoints desc, then winRate desc, top 3
+  const sorted = Object.entries(playerStats)
+    .sort(([, a], [, b]) => b.totalPoints - a.totalPoints || (b.winRate || 0) - (a.winRate || 0))
     .slice(0, 3);
   const list = document.getElementById('top-players-list');
   list.innerHTML = '';
-  sorted.forEach(([player, data], idx) => {
+  sorted.forEach(([player, data]) => {
     const card = document.createElement('div');
     card.className = 'result-card fade-in';
     card.innerHTML = `
@@ -100,7 +108,7 @@ function renderGameDetails(gameId, game) {
     <div class="result-card fade-in">
       <h3>Top 3 wyniki</h3>
       <ul>
-        ${game.topScores.map(score => 
+        ${game.topScores.map(score =>
           `<li><span class="player">${score.player}</span>: <span class="score">${score.score}</span> pkt</li>`
         ).join('')}
       </ul>
@@ -109,7 +117,28 @@ function renderGameDetails(gameId, game) {
   `;
 }
 
+// Zakładki (jak wcześniej)
+const tabBtns = Array.from(document.querySelectorAll('.tab-btn'));
+const tabSections = Array.from(document.querySelectorAll('.tab-section'));
+function showTab(tab) {
+  tabSections.forEach(section => {
+    if (section.id === `tab-${tab}`) {
+      section.classList.add('visible');
+      section.classList.add('fade-in');
+      setTimeout(() => section.classList.remove('fade-in'), 400);
+    } else {
+      section.classList.remove('visible');
+    }
+  });
+  tabBtns.forEach(btn => {
+    if (btn.dataset.tab === tab) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+  tabBtns[2].style.display = tab === 'game-details' ? 'inline-block' : 'none';
+}
+tabBtns.forEach(btn => btn.addEventListener('click', () => showTab(btn.dataset.tab)));
+document.getElementById('back-to-games').addEventListener('click', () => showTab('games'));
+
 // Inicjalizacja
 showTab('games');
-renderBestScores();
-renderTopPlayers();
+generateStatsAndRender();
