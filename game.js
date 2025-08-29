@@ -1,9 +1,22 @@
 import { db } from './firebase-config.js';
-import { collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { doc, getDoc, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const gameId = urlParams.get('gameId');
-document.getElementById('game-title').textContent = `Gra: ${gameId}`;
+
+// Pobierz nazwę gry z Firestore
+async function setGameTitle() {
+  const gameRef = doc(db, "games", gameId);
+  const gameSnap = await getDoc(gameRef);
+  if (gameSnap.exists()) {
+    const gameData = gameSnap.data();
+    document.getElementById('game-title').textContent = `Gra: ${gameData.name}`;
+  } else {
+    document.getElementById('game-title').textContent = "Gra nie znaleziona";
+  }
+}
+
+setGameTitle();
 
 const scoreForm = document.getElementById('add-score-form');
 const scoreTable = document.querySelector('#score-table tbody');
