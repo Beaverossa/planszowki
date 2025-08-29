@@ -19,6 +19,155 @@
   --notes-btn-hover: #339dff;
 }
 
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+header {
+  background: var(--bg-card);
+  padding: 16px 0;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+main {
+  padding: 24px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+footer {
+  background: var(--bg-card);
+  color: var(--text-muted);
+  padding: 14px;
+  text-align: center;
+  margin-top: 40px;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+/* Responsywne kafelki gier */
+.game-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 32px;
+  margin-top: 18px;
+}
+
+.game-card {
+  background: var(--bg-lighter);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 28px 18px 18px 18px;
+  transition: transform .17s, box-shadow .17s;
+  min-height: 220px;
+  max-height: 320px;
+  min-width: 0;
+  position: relative;
+}
+
+.game-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 10px 24px rgba(0,0,0,.6);
+}
+
+.game-card h3 {
+  margin-top: 16px;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  font-weight: 600;
+  text-align: center;
+}
+
+.game-card .game-link {
+  margin-top: auto;
+  padding: 10px 20px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 1em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .2s;
+  box-shadow: 0 2px 10px rgba(0,0,0,.18);
+}
+
+.game-card .game-link:hover {
+  background: var(--primary-hover);
+}
+
+.game-card img {
+  width: 76px;
+  height: 76px;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0,0,0,.18);
+}
+
+.delete-btn {
+  margin-top: 14px;
+  padding: 8px 18px;
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 0.95em;
+  cursor: pointer;
+  transition: background .2s;
+  box-shadow: 0 2px 10px rgba(0,0,0,.12);
+}
+
+.delete-btn:hover {
+  background: var(--danger-hover);
+}
+
+form {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+input[type="text"], input[type="url"], input[type="number"], textarea {
+  background: var(--bg-card);
+  color: var(--text);
+  border: none;
+  padding: 10px 16px;
+  border-radius: var(--border-radius);
+  font-size: 1em;
+  outline: none;
+  transition: box-shadow .17s;
+}
+
+input[type="text"]:focus, input[type="url"]:focus, input[type="number"]:focus, textarea:focus {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+button {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 10px 24px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background .2s;
+  box-shadow: 0 2px 10px rgba(0,0,0,.18);
+}
+
+section {
+  margin-bottom: 36px;
+}
+
+/* Uwagi do rozgrywki */
 .notes-box {
   background: var(--notes-bg);
   border-left: 4px solid var(--notes-border);
