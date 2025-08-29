@@ -1,5 +1,5 @@
 import { db } from './firebase-config.js';
-import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const gameId = urlParams.get('gameId');
