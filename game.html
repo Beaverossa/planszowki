@@ -17,6 +17,9 @@
       <form id="add-session-form" style="display:none; flex-direction:column; gap:16px; margin-top:18px;">
         <label>Liczba graczy: <input type="number" id="players-count" min="2" max="10" required></label>
         <div id="players-fields"></div>
+        <label>Uwagi (opcjonalnie):
+          <textarea id="session-notes" rows="3" placeholder="Dodaj uwagi do rozgrywki"></textarea>
+        </label>
         <button type="submit">Zapisz rozgrywkę</button>
         <button type="button" id="cancel-session" style="background:var(--accent);color:#000">Anuluj</button>
       </form>
@@ -41,6 +44,6 @@
     <p>© 2025 Twoja Strona Gier Planszowych</p>
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="game.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
