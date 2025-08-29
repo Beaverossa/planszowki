@@ -8,35 +8,39 @@
 </head>
 <body>
   <header>
-    <h1 id="game-title">Szczegóły gry</h1>
-    <a href="index.html">← Powrót</a>
+    <nav>
+      <a href="index.html">← Powrót</a>
+      <a href="hall.html" class="hall-link">Hall of Fame</a>
+      <h1 id="game-title">Szczegóły gry</h1>
+    </nav>
   </header>
-
   <main>
     <section>
-      <h2>Dodaj wynik</h2>
-      <form id="add-score-form">
-        <input type="text" id="player-name" placeholder="Imię gracza" required>
-        <input type="number" id="player-score" placeholder="Wynik" required>
-        <button type="submit">Dodaj wynik</button>
+      <h2>Ranking graczy</h2>
+      <div id="game-ranking" class="card-list"></div>
+    </section>
+    <section>
+      <h2>Wyniki (wykres)</h2>
+      <canvas id="score-chart" style="max-width:100%;background:var(--bg-card);border-radius:16px;"></canvas>
+    </section>
+    <section>
+      <h2>Uwagi do rozgrywek</h2>
+      <div id="game-notes"></div>
+    </section>
+    <section>
+      <h2>Dodaj sesję</h2>
+      <form id="add-session-form">
+        <div id="players-list"></div>
+        <label>Data: <input type="date" id="session-date" required></label>
+        <label>Uwagi: <input type="text" id="session-notes"></label>
+        <button type="submit">Dodaj sesję</button>
       </form>
     </section>
-
-    <section>
-      <h2>Ranking</h2>
-      <table id="score-table">
-        <thead>
-          <tr><th>Gracz</th><th>Wynik</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
   </main>
-
   <footer>
-    <p>© Jakub Jacek</p>
+    <p>© 2025 Twoja Strona Gier Planszowych</p>
   </footer>
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="module" src="game.js"></script>
 </body>
 </html>
