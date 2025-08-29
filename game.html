@@ -9,34 +9,38 @@
 <body>
   <header>
     <h1 id="game-title">Szczegóły gry</h1>
-    <a href="index.html">← Powrót</a>
+    <a href="index.html" class="game-link" style="margin:12px 0 0 0">← Powrót</a>
   </header>
-
   <main>
     <section>
-      <h2>Dodaj wynik</h2>
-      <form id="add-score-form">
-        <input type="text" id="player-name" placeholder="Imię gracza" required>
-        <input type="number" id="player-score" placeholder="Wynik" required>
-        <button type="submit">Dodaj wynik</button>
+      <button id="add-session-btn">Dodaj rozgrywkę</button>
+      <form id="add-session-form" style="display:none; flex-direction:column; gap:16px; margin-top:18px;">
+        <label>Liczba graczy: <input type="number" id="players-count" min="2" max="10" required></label>
+        <div id="players-fields"></div>
+        <button type="submit">Zapisz rozgrywkę</button>
+        <button type="button" id="cancel-session" style="background:var(--accent);color:#000">Anuluj</button>
       </form>
     </section>
-
     <section>
-      <h2>Ranking</h2>
-      <table id="score-table">
-        <thead>
-          <tr><th>Gracz</th><th>Wynik</th></tr>
-        </thead>
+      <h2>Ranking graczy</h2>
+      <table id="ranking-table">
+        <thead><tr><th>Gracz</th><th>Suma punktów</th></tr></thead>
         <tbody></tbody>
       </table>
     </section>
+    <section>
+      <h2>Historia rozgrywek</h2>
+      <div id="history-list"></div>
+    </section>
+    <section>
+      <h2>Wykres punktowy</h2>
+      <canvas id="score-chart" height="220"></canvas>
+    </section>
   </main>
-
   <footer>
     <p>© 2025 Twoja Strona Gier Planszowych</p>
   </footer>
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="module" src="game.js"></script>
 </body>
 </html>
