@@ -13,27 +13,29 @@
       <h1>Hall of Fame</h1>
     </nav>
   </header>
-
   <main>
-    <!-- Najlepsze wyniki w każdej grze -->
-    <section id="best-scores">
-      <h2>Najlepsze wyniki wszech czasów</h2>
-      <ul>
-        <!-- Lista rekordów -->
-      </ul>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="games">Najlepsze wyniki gier</button>
+      <button class="tab-btn" data-tab="players">Najlepsi gracze globalnie</button>
+      <button class="tab-btn" data-tab="game-details" style="display:none">Szczegóły gry</button>
+    </div>
+    <section id="tab-games" class="tab-section visible">
+      <h2>Najlepsze wyniki w każdej grze</h2>
+      <div id="best-scores-list" class="card-list"></div>
     </section>
-
-    <!-- Najlepsi gracze globalnie -->
-    <section id="top-players">
-      <h2>Najlepsi gracze</h2>
-      <ul>
-        <!-- Lista najlepszych graczy -->
-      </ul>
+    <section id="tab-players" class="tab-section">
+      <h2>Najlepsi gracze globalnie</h2>
+      <div id="top-players-list" class="card-list"></div>
+    </section>
+    <section id="tab-game-details" class="tab-section">
+      <button id="back-to-games" class="back-btn">← Powrót do listy gier</button>
+      <h2 id="game-detail-title"></h2>
+      <div id="game-detail-top" class="card-list"></div>
     </section>
   </main>
-
   <footer>
-    <p><a href="#top">Do góry</a></p>
+    <p>© 2025 Twoja Strona Gier Planszowych</p>
   </footer>
+  <script type="module" src="hall.js"></script>
 </body>
 </html>
